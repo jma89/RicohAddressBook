@@ -429,6 +429,8 @@ function Format-PropertyList {
         if ($properties.ContainsKey('remoteFolder:select') -and 'private' -eq $properties['remoteFolder:select']) {
             $output.FolderScanAccount = $properties['remoteFolder:accountName']
         }
+
+        $output.FolderServerName = $properties['remoteFolder:serverName']
     }
 
     if (Test-Property $properties 'mail:') {
@@ -720,8 +722,14 @@ function Get-TagIdValue {
 .Parameter UserCode
     The User Code property used for authentication management.
 
+.Parameter FolderScanType
+    The protocol used for scanned file transfer. Either smb or ftp.
+
 .Parameter FolderScanPath
     The network path used to save scanned files.
+
+.Parameter FolderServerName
+    The server IP or DNS name for FTP scans.
 
 .Parameter FolderScanAccount
     The account to use to save the scanned files to a network location.
@@ -869,9 +877,20 @@ function Update-AddressBookEntry {
         $UserCode,
 
         [string]
+        [ValidateSet('smb', 'ftp')]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [PSDefaultValue(Help = "SMB", Value = "smb")]
+        $FolderScanType,
+
+        [string]
         [ValidateLength(1, 256)]
         [Parameter(ValueFromPipelineByPropertyName)]
         $FolderScanPath,
+
+        [string]
+        [ValidateLength(1, 256)]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        $FolderServerName,
 
         [pscredential]
         [Parameter(ValueFromPipelineByPropertyName)]
@@ -977,9 +996,10 @@ function Update-AddressBookEntry {
 
             if (-not [string]::IsNullOrEmpty($FolderScanPath)) {
                 add 'remoteFolder:' 'true'
-                add 'remoteFolder:type' 'smb'
+                add 'remoteFolder:type' $FolderScanType
                 add 'remoteFolder:path' $FolderScanPath
                 add 'remoteFolder:port' 21
+                add 'remoteFolder:serverName' $FolderServerName
             } elseif ($ForceFolderScanPath) {
                 add 'remoteFolder:' 'false'
             }
@@ -1093,8 +1113,14 @@ function Update-AddressBookEntry {
 .Parameter UserCode
     The User Code property used for authentication management.
 
+.Parameter FolderScanType
+    The protocol used for scanned file transfer. Either smb or ftp.
+
 .Parameter FolderScanPath
     The network path used to save scanned files.
+
+.Parameter FolderServerName
+    The server IP or DNS name for FTP scans.
 
 .Parameter FolderScanAccount
     The account to use to save the scanned files to a network location.
@@ -1227,10 +1253,22 @@ function Add-AddressBookEntry {
         $UserCode,
 
         [string]
+        [ValidateSet('smb', 'ftp')]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [PSDefaultValue(Help = "SMB", Value = "smb")]
+        $FolderScanType,
+
+        [string]
         [ValidateLength(1, 256)]
         [Parameter(ParameterSetName = 'Folder', Mandatory, ValueFromPipelineByPropertyName)]
         [Parameter(ParameterSetName = 'FolderAndEmail', Mandatory, ValueFromPipelineByPropertyName)]
         $FolderScanPath,
+
+        [string]
+        [ValidateLength(1, 256)]
+        [Parameter(ParameterSetName = 'Folder', ValueFromPipelineByPropertyName)]
+        [Parameter(ParameterSetName = 'FolderAndEmail', ValueFromPipelineByPropertyName)]
+        $FolderServerName,
 
         [pscredential]
         [Parameter(ParameterSetName = 'Folder', ValueFromPipelineByPropertyName)]
@@ -1318,9 +1356,10 @@ function Add-AddressBookEntry {
 
             if (-not [string]::IsNullOrEmpty($FolderScanPath)) {
                 add 'remoteFolder:' 'true'
-                add 'remoteFolder:type' 'smb'
+                add 'remoteFolder:type' $FolderScanType
                 add 'remoteFolder:path' $FolderScanPath
                 add 'remoteFolder:port' 21
+                add 'remoteFolder:serverName' $FolderServerName
 
                 if ($null -ne $FolderScanAccount) {
                     add 'remoteFolder:select' 'private'

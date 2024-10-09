@@ -26,6 +26,7 @@
         <item>remoteFolder:path</item>
         <item>remoteFolder:port</item>
         <item>remoteFolder:accountName</item>
+        <item>remoteFolder:serverName</item>
         <item>mail:</item>
         <item>mail:address</item>
         <item>isSender</item>
